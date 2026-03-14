@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beast Mode Counter</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0f0c29;
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 50px;
+            border-radius: 40px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            width: 400px;
+            position: relative;
+        }
+
+        .badge {
+            background: #f1c40f;
+            color: black;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            color: #00d2ff;
+        }
+
+        .counter-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 100px;
+            font-weight: 700;
+            margin: 20px 0;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .progress-container {
+            background: rgba(255,255,255,0.1);
+            height: 8px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        #bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            box-shadow: 0 0 15px #00d2ff;
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .main-btn {
+            background: #00d2ff;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            border: none;
+            padding: 22px;
+            width: 100%;
+            border-radius: 20px;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
+            transition: 0.3s;
+        }
+
+        .main-btn:active { transform: scale(0.95); }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: #333;
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: bottom 0.5s ease;
+            z-index: 100;
+            width: 80%;
+            max-width: 350px;
+        }
+
+        .toast.active { bottom: 40px; }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            background: none;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            font-size: 11px;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div id="rank" class="badge">Rookie Executive</div>
+        <h1>Work Item Tracker</h1>
+        
+        <div class="counter-display" id="countText">0</div>
+        
+        <div class="progress-container">
+            <div id="bar"></div>
+        </div>
+        
+        <button class="main-btn" onclick="addWork()">WORK ITEM +1</button>
+        
+        <div class="stats">
+            <span>TARGET: 300</span>
+            <span>LEFT: <span id="itemsLeft">300</span></span>
+        </div>
+
+        <button class="reset-btn" onclick="resetCount()">Reset Session</button>
+    </div>
+
+    <div id="toast" class="toast">
+        <span style="font-size: 25px; margin-right: 15px;">🔥</span>
+        <div style="font-size: 13px;">
+            <strong>Bht Badia!</strong>
+            <div id="toastMsg">Aapne 1 item kar liya hai.</div>
+        </div>
+    </div>
+
+    <script>
+        let count = localStorage.getItem('workCount') ? parseInt(localStorage.getItem('workCount')) : 0;
+        const target = 300;
+
+        // Page load par purana data dikhane ke liye
+        updateDisplay();
+
+        function addWork() {
+            count++;
+            localStorage.setItem('workCount', count);
+            
+            updateDisplay();
+            playBeep();
+            
+            // Celebration
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.8 },
+                colors: ['#00d2ff', '#ffffff']
+            });
+
+            showToast();
+        }
+
+        function updateDisplay() {
+            document.getElementById('countText').innerText = count;
+            document.getElementById('itemsLeft').innerText = Math.max(0, target - count);
+            
+            // Progress Bar
+            let percent = (count / target) * 100;
+            document.getElementById('bar').style.width = Math.min(percent, 100) + "%";
+
+            // Rank Logic
+            let rank = document.getElementById('rank');
+            if (count >= 200) { rank.innerText = "Pro  🔥"; rank.style.background = "#e74c3c"; }
+            else if (count >= 100) { rank.innerText = "Senior Executive 🏆"; rank.style.background = "#2ecc71"; }
+            else if (count >= 50) { rank.innerText = "Noob ⚡"; rank.style.background = "#3498db"; }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = `Aapne ${count} item kar lia hai. Target 300 ka hai, lage raho!`;
+            
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 2500);
+        }
+
+        function playBeep() {
+            let context = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = context.createOscillator();
+            let gain = context.createGain();
+            osc.connect(gain);
+            gain.connect(context.destination);
+            osc.frequency.value = 800;
+            gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.1);
+            osc.start();
+            osc.stop(context.currentTime + 0.1);
+        }
+
+        function resetCount() {
+            if(confirm("Kya aap aaj ka progress zero karna chahte hain?")) {
+                count = 0;
+                localStorage.removeItem('workCount');
+                updateDisplay();
+            }
+        }
+    </script>
+</body>
+</html>
