@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPS Style Work Tracker</title>
     
+    <title>Riyansh UPS Tracker - Easy Work Monitoring Tool</title>
+    <meta name="description" content="Official Riyansh UPS Tracker for high-speed operation monitoring. Track your daily shipping targets with desi beast mode motivation.">
+    <meta name="keywords" content="Riyansh UPS Tracker, Riyansh Work Tracker, UPS Operation Tool, Ravi Pandey Tracker">
+    <meta name="author" content="Riyansh">
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@600&display=swap');
 
-        /* --- UPS COLOR PALETTE --- */
         :root {
-            --ups-brown: #351c15; /* Pullman Brown */
-            --ups-gold: #ffb500;  /* UPS Gold/Yellow */
-            --ups-light-gold: #ffcc00;
+            --ups-brown: #351c15; 
+            --ups-gold: #ffb500;  
             --white: #ffffff;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--ups-brown);
-            /* Halka sa texture background mein */
             background-image: radial-gradient(circle at center, #4d2b22 0%, #351c15 100%);
             height: 100vh;
             margin: 0;
@@ -35,12 +36,13 @@
         .ups-card {
             background: var(--white);
             padding: 35px;
-            border-radius: 10px; /* UPS style sharp yet slightly rounded corners */
+            border-radius: 10px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             width: 380px;
             color: var(--ups-brown);
             border-top: 8px solid var(--ups-gold);
+            position: relative;
         }
 
         .target-setter {
@@ -59,7 +61,7 @@
             width: 60px;
             text-align: center;
             font-weight: bold;
-            color: var(--ups-brown);
+            outline: none;
         }
 
         .counter-display {
@@ -114,8 +116,6 @@
             box-shadow: 0 4px 0 #cc9200;
         }
         
-        .btn-plus:hover { background: var(--ups-light-gold); }
-
         .btn-minus { 
             flex: 1; 
             background: #eeeeee; 
@@ -125,7 +125,7 @@
 
         .btn:active { transform: translateY(2px); box-shadow: none; }
 
-        /* Toast Popup - UPS Style */
+        /* Toast - Enhanced Visibility */
         .toast {
             position: fixed; top: -250px; left: 50%; transform: translateX(-50%);
             background: var(--ups-brown); color: var(--ups-gold); padding: 20px; 
@@ -136,7 +136,7 @@
         }
         .toast.active { top: 30px; }
         .toast b { font-size: 18px; display: block; text-transform: uppercase; margin-bottom: 5px; }
-        .toast p { margin: 0; color: white; font-size: 14px; }
+        .toast p { margin: 0; color: white; font-size: 14px; font-weight: 500; }
 
         .reset { margin-top: 25px; font-size: 11px; color: #999; cursor: pointer; text-decoration: underline; }
     </style>
@@ -177,17 +177,15 @@
         let target = localStorage.getItem('upsTrackerTarget') ? parseInt(localStorage.getItem('upsTrackerTarget')) : 300;
         let toastTimer;
 
-        const randomFunnyMessages = [
+        const funnyLines = [
             "Bhai aag lga rha hai tu!",
             "Rukna mana hai, agla item pakad!",
             "System phaad denge, chalte rho!",
             "Abhi toh party shuru hui hai!",
-            "Energy kam nhi honi chaiye!",
             "Oye hoye, kya speed hai!",
-            "Top marega kya aaj?",
-            "Lage raho munna bhai!",
-            "Gazab ki raftaar hai!",
-            "Work mode: BEAST!"
+            "Work mode: BEAST!",
+            "Lage raho Riyansh bhai!",
+            "Gazab ki raftaar!"
         ];
 
         document.getElementById('targetInput').value = target;
@@ -210,28 +208,28 @@
         function handleFeedback() {
             let title = "BHT BADIA!";
             let remaining = target - count;
-            let msg = `Aapne ${count} kr liye hain, ab bas ${remaining > 0 ? remaining : 0} aur bache hain!`;
+            let msg = `Aapne ${count} item kr liye hain, ab bas ${remaining > 0 ? remaining : 0} aur bache hain target ke liye!`;
 
             if (count === 50) {
                 title = "PHIR WHI CASUAL BEHVAIOUR!";
                 msg = `${target} chaiye mujhe, rukna nahi hai. Abhi ${target - count} baaki hain!`;
             } else if (count === 100) {
                 title = "SUN MERI BAAT...";
-                msg = `Lunch krle par yaad rkhna ${target} poore krne hain.`;
+                msg = `Aisa kar lunch krle phir tune ${target} krne hain.`;
             } else if (count === 200) {
                 title = "NI HORI PDAI MATLAAB?";
-                msg = `300 chaiye byi, abhi bht door ho.`;
+                msg = `Abhi door ho, khich ke lo kaam!`;
             } else if (count === target) {
                 title = "SHABASH LALA!";
-                msg = `Target achieved! ${target} items delivered.`;
-                fireConfetti(150);
+                msg = `Target achieved! ${target} items delivered successfully.`;
+                fireConfetti(200);
             } else if (count > target) {
                 title = "MAAT KR LALA!";
                 msg = "Salary utni hi aaegi, zyada shana mat ban.";
             } else if (count % 10 === 0) {
                 title = "SPEED UPDATED!";
-                msg = randomFunnyMessages[Math.floor(Math.random() * randomFunnyMessages.length)];
-                fireConfetti(50);
+                msg = funnyLines[Math.floor(Math.random() * funnyLines.length)];
+                fireConfetti(60);
             }
 
             showToast(title, msg);
@@ -243,7 +241,6 @@
             document.getElementById('doneCount').innerText = count;
             let remaining = target - count;
             document.getElementById('remainingCount').innerText = remaining > 0 ? remaining : 0;
-            
             let percent = (count / target) * 100;
             document.getElementById('bar').style.width = Math.min(percent, 100) + "%";
         }
@@ -267,7 +264,7 @@
         }
 
         function resetCount() {
-            if(confirm("Log clear karein?")) {
+            if(confirm("New day, new start? Log clear karein?")) {
                 count = 0;
                 localStorage.removeItem('upsTrackerCount');
                 updateUI();
