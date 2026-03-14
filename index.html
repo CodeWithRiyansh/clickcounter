@@ -3,235 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beast Mode Counter</title>
+    <title>UPS Style Work Tracker</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@600&display=swap');
+
+        /* --- UPS COLOR PALETTE --- */
+        :root {
+            --ups-brown: #351c15; /* Pullman Brown */
+            --ups-gold: #ffb500;  /* UPS Gold/Yellow */
+            --ups-light-gold: #ffcc00;
+            --white: #ffffff;
+        }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #0f0c29;
-            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--ups-brown);
+            /* Halka sa texture background mein */
+            background-image: radial-gradient(circle at center, #4d2b22 0%, #351c15 100%);
             height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: var(--white);
             overflow: hidden;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 50px;
-            border-radius: 40px;
+        .ups-card {
+            background: var(--white);
+            padding: 35px;
+            border-radius: 10px; /* UPS style sharp yet slightly rounded corners */
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            width: 400px;
-            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            width: 380px;
+            color: var(--ups-brown);
+            border-top: 8px solid var(--ups-gold);
         }
 
-        .badge {
-            background: #f1c40f;
-            color: black;
-            padding: 5px 15px;
-            border-radius: 20px;
+        .target-setter {
+            background: #f4f4f4;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
             font-weight: bold;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            display: inline-block;
+            font-size: 14px;
         }
 
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 22px;
-            letter-spacing: 3px;
-            margin-bottom: 30px;
-            color: #00d2ff;
+        input {
+            border: 2px solid var(--ups-brown);
+            padding: 5px;
+            border-radius: 4px;
+            width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--ups-brown);
         }
 
         .counter-display {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Oswald', sans-serif;
             font-size: 100px;
-            font-weight: 700;
-            margin: 20px 0;
-            background: linear-gradient(to bottom, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            margin: 0;
+            color: var(--ups-brown);
+            line-height: 1;
+        }
+
+        .stats-box {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            color: #555;
         }
 
         .progress-container {
-            background: rgba(255,255,255,0.1);
-            height: 8px;
-            border-radius: 10px;
-            margin: 20px 0;
+            background: #e0e0e0;
+            height: 12px;
+            border-radius: 2px;
+            margin-bottom: 25px;
             overflow: hidden;
         }
 
         #bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            box-shadow: 0 0 15px #00d2ff;
-            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%; width: 0%;
+            background: var(--ups-gold);
+            transition: width 0.4s ease;
         }
 
-        .main-btn {
-            background: #00d2ff;
-            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
-            border: none;
-            padding: 22px;
-            width: 100%;
-            border-radius: 20px;
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
-            transition: 0.3s;
+        .controls { display: flex; gap: 10px; }
+        
+        .btn { 
+            border: none; 
+            padding: 18px; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.2s;
+            text-transform: uppercase;
+            font-size: 16px;
         }
 
-        .main-btn:active { transform: scale(0.95); }
+        .btn-plus { 
+            flex: 2; 
+            background: var(--ups-gold); 
+            color: var(--ups-brown);
+            box-shadow: 0 4px 0 #cc9200;
+        }
+        
+        .btn-plus:hover { background: var(--ups-light-gold); }
 
-        /* Notification Toast */
+        .btn-minus { 
+            flex: 1; 
+            background: #eeeeee; 
+            color: #777;
+            border: 1px solid #ddd;
+        }
+
+        .btn:active { transform: translateY(2px); box-shadow: none; }
+
+        /* Toast Popup - UPS Style */
         .toast {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            color: #333;
-            padding: 15px 25px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: bottom 0.5s ease;
-            z-index: 100;
-            width: 80%;
-            max-width: 350px;
+            position: fixed; top: -250px; left: 50%; transform: translateX(-50%);
+            background: var(--ups-brown); color: var(--ups-gold); padding: 20px; 
+            border-radius: 5px; width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            z-index: 1000; text-align: center;
+            border: 2px solid var(--ups-gold);
         }
+        .toast.active { top: 30px; }
+        .toast b { font-size: 18px; display: block; text-transform: uppercase; margin-bottom: 5px; }
+        .toast p { margin: 0; color: white; font-size: 14px; }
 
-        .toast.active { bottom: 40px; }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 25px;
-            font-size: 12px;
-            color: #888;
-        }
-
-        .reset-btn {
-            margin-top: 20px;
-            background: none;
-            border: none;
-            color: #555;
-            cursor: pointer;
-            font-size: 11px;
-            text-decoration: underline;
-        }
+        .reset { margin-top: 25px; font-size: 11px; color: #999; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <div class="glass-card">
-        <div id="rank" class="badge">Rookie Executive</div>
-        <h1>Work Item Tracker</h1>
+    <div class="ups-card">
+        <div class="target-setter">
+            GOAL SETTER: <input type="number" id="targetInput" value="300" onchange="updateTarget()">
+        </div>
+
+        <div class="counter-display" id="countVal">0</div>
         
-        <div class="counter-display" id="countText">0</div>
-        
+        <div class="stats-box">
+            <span>COMPLETED: <span id="doneCount">0</span></span>
+            <span>REMAINING: <span id="remainingCount">300</span></span>
+        </div>
+
         <div class="progress-container">
             <div id="bar"></div>
         </div>
         
-        <button class="main-btn" onclick="addWork()">WORK ITEM +1</button>
-        
-        <div class="stats">
-            <span>TARGET: 300</span>
-            <span>LEFT: <span id="itemsLeft">300</span></span>
+        <div class="controls">
+            <button class="btn btn-minus" onclick="changeCount(-1)">−</button>
+            <button class="btn btn-plus" onclick="changeCount(1)">SHIP ITEM +1</button>
         </div>
-
-        <button class="reset-btn" onclick="resetCount()">Reset Session</button>
+        
+        <div class="reset" onclick="resetCount()">Reset Daily Log</div>
     </div>
 
     <div id="toast" class="toast">
-        <span style="font-size: 25px; margin-right: 15px;">🔥</span>
-        <div style="font-size: 13px;">
-            <strong>Bht Badia!</strong>
-            <div id="toastMsg">Aapne 1 item kar liya hai.</div>
-        </div>
+        <b id="toastTitle">Tracking Update</b>
+        <p id="toastMsg"></p>
     </div>
 
     <script>
-        let count = localStorage.getItem('workCount') ? parseInt(localStorage.getItem('workCount')) : 0;
-        const target = 300;
+        let count = localStorage.getItem('upsTrackerCount') ? parseInt(localStorage.getItem('upsTrackerCount')) : 0;
+        let target = localStorage.getItem('upsTrackerTarget') ? parseInt(localStorage.getItem('upsTrackerTarget')) : 300;
+        let toastTimer;
 
-        // Page load par purana data dikhane ke liye
-        updateDisplay();
+        const randomFunnyMessages = [
+            "Bhai aag lga rha hai tu!",
+            "Rukna mana hai, agla item pakad!",
+            "System phaad denge, chalte rho!",
+            "Abhi toh party shuru hui hai!",
+            "Energy kam nhi honi chaiye!",
+            "Oye hoye, kya speed hai!",
+            "Top marega kya aaj?",
+            "Lage raho munna bhai!",
+            "Gazab ki raftaar hai!",
+            "Work mode: BEAST!"
+        ];
 
-        function addWork() {
-            count++;
-            localStorage.setItem('workCount', count);
-            
-            updateDisplay();
-            playBeep();
-            
-            // Celebration
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.8 },
-                colors: ['#00d2ff', '#ffffff']
-            });
+        document.getElementById('targetInput').value = target;
+        updateUI();
 
-            showToast();
+        function updateTarget() {
+            target = parseInt(document.getElementById('targetInput').value) || 300;
+            localStorage.setItem('upsTrackerTarget', target);
+            updateUI();
         }
 
-        function updateDisplay() {
-            document.getElementById('countText').innerText = count;
-            document.getElementById('itemsLeft').innerText = Math.max(0, target - count);
+        function changeCount(val) {
+            if (val === -1 && count === 0) return;
+            count += val;
+            localStorage.setItem('upsTrackerCount', count);
+            updateUI();
+            if (val === 1) handleFeedback();
+        }
+
+        function handleFeedback() {
+            let title = "BHT BADIA!";
+            let remaining = target - count;
+            let msg = `Aapne ${count} kr liye hain, ab bas ${remaining > 0 ? remaining : 0} aur bache hain!`;
+
+            if (count === 50) {
+                title = "PHIR WHI CASUAL BEHVAIOUR!";
+                msg = `${target} chaiye mujhe, rukna nahi hai. Abhi ${target - count} baaki hain!`;
+            } else if (count === 100) {
+                title = "SUN MERI BAAT...";
+                msg = `Lunch krle par yaad rkhna ${target} poore krne hain.`;
+            } else if (count === 200) {
+                title = "NI HORI PDAI MATLAAB?";
+                msg = `300 chaiye byi, abhi bht door ho.`;
+            } else if (count === target) {
+                title = "SHABASH LALA!";
+                msg = `Target achieved! ${target} items delivered.`;
+                fireConfetti(150);
+            } else if (count > target) {
+                title = "MAAT KR LALA!";
+                msg = "Salary utni hi aaegi, zyada shana mat ban.";
+            } else if (count % 10 === 0) {
+                title = "SPEED UPDATED!";
+                msg = randomFunnyMessages[Math.floor(Math.random() * randomFunnyMessages.length)];
+                fireConfetti(50);
+            }
+
+            showToast(title, msg);
+            if (count < target) fireConfetti(20);
+        }
+
+        function updateUI() {
+            document.getElementById('countVal').innerText = count;
+            document.getElementById('doneCount').innerText = count;
+            let remaining = target - count;
+            document.getElementById('remainingCount').innerText = remaining > 0 ? remaining : 0;
             
-            // Progress Bar
             let percent = (count / target) * 100;
             document.getElementById('bar').style.width = Math.min(percent, 100) + "%";
-
-            // Rank Logic
-            let rank = document.getElementById('rank');
-            if (count >= 200) { rank.innerText = "Pro  🔥"; rank.style.background = "#e74c3c"; }
-            else if (count >= 100) { rank.innerText = "Senior Executive 🏆"; rank.style.background = "#2ecc71"; }
-            else if (count >= 50) { rank.innerText = "Noob ⚡"; rank.style.background = "#3498db"; }
         }
 
-        function showToast() {
+        function showToast(t, m) {
             const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = `Aapne ${count} item kar lia hai. Target 300 ka hai, lage raho!`;
-            
+            document.getElementById('toastTitle').innerText = t;
+            document.getElementById('toastMsg').innerText = m;
+            clearTimeout(toastTimer);
             toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 2500);
+            toastTimer = setTimeout(() => toast.classList.remove('active'), 6000);
         }
 
-        function playBeep() {
-            let context = new (window.AudioContext || window.webkitAudioContext)();
-            let osc = context.createOscillator();
-            let gain = context.createGain();
-            osc.connect(gain);
-            gain.connect(context.destination);
-            osc.frequency.value = 800;
-            gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.1);
-            osc.start();
-            osc.stop(context.currentTime + 0.1);
+        function fireConfetti(amt) {
+            confetti({ 
+                particleCount: amt, 
+                spread: 70, 
+                origin: { y: 0.7 },
+                colors: ['#ffb500', '#ffffff', '#351c15'] 
+            });
         }
 
         function resetCount() {
-            if(confirm("Kya aap aaj ka progress zero karna chahte hain?")) {
+            if(confirm("Log clear karein?")) {
                 count = 0;
-                localStorage.removeItem('workCount');
-                updateDisplay();
+                localStorage.removeItem('upsTrackerCount');
+                updateUI();
             }
         }
     </script>
