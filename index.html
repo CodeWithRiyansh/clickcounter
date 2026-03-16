@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riyansh UPS Tracker - Desi Beast Mode</title>
+    <title>Riyansh UPS Tracker - Stable Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
@@ -43,14 +43,15 @@
         .btn:active { transform: translateY(2px); box-shadow: none; }
         .reset { margin-top: 15px; font-size: 10px; color: #999; cursor: pointer; text-decoration: underline; }
 
-        /* Toast Styling - Important for Slangs */
+        /* Stable Toast Animation */
         .toast {
-            position: fixed; top: -250px; left: 50%; transform: translateX(-50%);
+            position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
             background: var(--ups-brown); color: var(--ups-gold); padding: 20px; 
             border-radius: 8px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; text-align: center; border: 2px solid var(--ups-gold);
+            transition: top 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 1000; text-align: center; border: 2px solid var(--ups-gold);
+            visibility: hidden; opacity: 0;
         }
-        .toast.active { top: 30px; }
+        .toast.active { top: 30px; visibility: visible; opacity: 1; }
         .toast b { font-size: 18px; display: block; text-transform: uppercase; margin-bottom: 5px; }
     </style>
 </head>
@@ -92,6 +93,8 @@
         };
 
         const slangs = ["Bhai aag lga rha hai tu!", "System phaad denge, chalte rho!", "Oye hoye, kya speed hai!", "Gazab ki raftaar!", "Work mode: BEAST!"];
+        let toastQueue = [];
+        let isToastShowing = false;
 
         document.getElementById('targetInput').value = data.target;
         updateUI();
@@ -103,12 +106,11 @@
                 if (data.utc % 10 === 0) confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
             } else if (type === 'email') {
                 data.emailRes++;
-                showToast("Email Logged", "Reschedule record ho gaya.");
+                queueToast("Email Logged", "Reschedule record ho gaya.");
             } else if (type === 'vm') {
                 data.vmRes++;
-                showToast("VM Logged", "Voice mail reschedule record ho gaya.");
+                queueToast("VM Logged", "Voice mail reschedule record ho gaya.");
             }
-
             saveAndRefresh();
         }
 
@@ -129,7 +131,35 @@
                 confetti({ particleCount: 30, colors: ['#ffb500'] });
             }
 
-            showToast(title, msg);
+            queueToast(title, msg);
+        }
+
+        function queueToast(title, msg) {
+            toastQueue.push({ title, msg });
+            processQueue();
+        }
+
+        function processQueue() {
+            if (isToastShowing || toastQueue.length === 0) return;
+
+            isToastShowing = true;
+            const current = toastQueue.shift();
+            const toast = document.getElementById('toast');
+            
+            document.getElementById('toastTitle').innerText = current.title;
+            document.getElementById('toastMsg').innerText = current.msg;
+            
+            toast.classList.add('active');
+
+            // 3 seconds tak dikhayega (stable)
+            setTimeout(() => {
+                toast.classList.remove('active');
+                // Animation khatam hone ka wait karega agle toast se pehle
+                setTimeout(() => {
+                    isToastShowing = false;
+                    processQueue();
+                }, 600); 
+            }, 3000);
         }
 
         function updateTarget() {
@@ -151,26 +181,18 @@
             document.getElementById('bar').style.width = Math.min((data.utc/data.target)*100, 100) + "%";
         }
 
-        function showToast(t, m) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastTitle').innerText = t;
-            document.getElementById('toastMsg').innerText = m;
-            toast.classList.add('active');
-              setTimeout(() => toast.classList.remove('active'), 3500);
-        }
-
         function downloadReport() {
             let csv = `Category,Count\nTotal Work Item,${data.utc}\nEmail Reschedule,${data.emailRes}\nVM Reschedule,${data.vmRes}`;
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', `Today_Report_${new Date().toLocaleDateString()}.csv`);
+            a.setAttribute('download', `Report_${new Date().toLocaleDateString()}.csv`);
             a.click();
         }
 
         function resetAll() {
-            if(confirm("Log clear karein?")) {
+            if(confirm("Saara data clear karein?")) {
                 localStorage.removeItem('riyanshProData');
                 location.reload();
             }
