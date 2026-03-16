@@ -3,271 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Riyansh UPS Tracker - Easy Work Monitoring Tool</title>
-    <meta name="description" content="Official Riyansh UPS Tracker for high-speed operation monitoring. Track your daily shipping targets with desi beast mode motivation.">
-    <meta name="keywords" content="Riyansh UPS Tracker, Riyansh Work Tracker, UPS Operation Tool, Ravi Pandey Tracker">
-    <meta name="author" content="Riyansh">
-
+    <title>Riyansh UPS Tracker - Desi Beast Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@600&display=swap');
-
-        :root {
-            --ups-brown: #351c15; 
-            --ups-gold: #ffb500;  
-            --white: #ffffff;
-        }
+        :root { --ups-brown: #351c15; --ups-gold: #ffb500; --white: #ffffff; }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--ups-brown);
-            background-image: radial-gradient(circle at center, #4d2b22 0%, #351c15 100%);
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--white);
-            overflow: hidden;
+            font-family: 'Roboto', sans-serif; background-color: var(--ups-brown);
+            height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; color: var(--white);
         }
 
         .ups-card {
-            background: var(--white);
-            padding: 35px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            width: 380px;
-            color: var(--ups-brown);
-            border-top: 8px solid var(--ups-gold);
-            position: relative;
+            background: var(--white); padding: 25px; border-radius: 12px; text-align: center;
+            width: 420px; color: var(--ups-brown); border-top: 8px solid var(--ups-gold); box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        .target-setter {
-            background: #f4f4f4;
-            padding: 12px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            font-size: 14px;
-        }
+        .goal-section { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; font-size: 13px; }
+        input { border: 2px solid var(--ups-brown); width: 55px; text-align: center; font-weight: bold; border-radius: 4px; }
 
-        input {
-            border: 2px solid var(--ups-brown);
-            padding: 5px;
-            border-radius: 4px;
-            width: 60px;
-            text-align: center;
-            font-weight: bold;
-            outline: none;
-        }
-
-        .counter-display {
-            font-family: 'Oswald', sans-serif;
-            font-size: 100px;
-            margin: 0;
-            color: var(--ups-brown);
-            line-height: 1;
-        }
-
-        .stats-box {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 12px;
-            color: #555;
-        }
-
-        .progress-container {
-            background: #e0e0e0;
-            height: 12px;
-            border-radius: 2px;
-            margin-bottom: 25px;
-            overflow: hidden;
-        }
-
-        #bar {
-            height: 100%; width: 0%;
-            background: var(--ups-gold);
-            transition: width 0.4s ease;
-        }
-
-        .controls { display: flex; gap: 10px; }
+        .main-display { margin: 5px 0; }
+        .main-display h1 { font-family: 'Oswald', sans-serif; font-size: 85px; margin: 0; color: var(--ups-brown); line-height: 1; }
         
-        .btn { 
-            border: none; 
-            padding: 18px; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: 0.2s;
-            text-transform: uppercase;
-            font-size: 16px;
-        }
+        .progress-container { background: #e0e0e0; height: 12px; border-radius: 6px; margin: 15px 0; overflow: hidden; }
+        #bar { height: 100%; width: 0%; background: var(--ups-gold); transition: width 0.4s; }
 
-        .btn-plus { 
-            flex: 2; 
-            background: var(--ups-gold); 
-            color: var(--ups-brown);
-            box-shadow: 0 4px 0 #cc9200;
-        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .stat-box { background: #f5f5f5; padding: 8px; border-radius: 5px; border: 1px solid #ddd; font-size: 11px; }
+        .stat-num { font-family: 'Oswald', sans-serif; font-size: 20px; display: block; color: #555; }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { border: none; padding: 15px; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: 0.2s; }
         
-        .btn-minus { 
-            flex: 1; 
-            background: #eeeeee; 
-            color: #777;
-            border: 1px solid #ddd;
-        }
+        .btn-utc { background: var(--ups-gold); color: var(--ups-brown); grid-column: span 2; font-size: 16px; box-shadow: 0 4px 0 #cc9200; }
+        .btn-res { background: #eeeeee; color: #555; border: 1px solid #ccc; }
+        .btn-download { background: var(--ups-brown); color: var(--ups-gold); grid-column: span 2; margin-top: 10px; }
 
         .btn:active { transform: translateY(2px); box-shadow: none; }
+        .reset { margin-top: 15px; font-size: 10px; color: #999; cursor: pointer; text-decoration: underline; }
 
-        /* Toast - Enhanced Visibility */
+        /* Toast Styling - Important for Slangs */
         .toast {
             position: fixed; top: -250px; left: 50%; transform: translateX(-50%);
             background: var(--ups-brown); color: var(--ups-gold); padding: 20px; 
-            border-radius: 5px; width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            z-index: 1000; text-align: center;
-            border: 2px solid var(--ups-gold);
+            border-radius: 8px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; text-align: center; border: 2px solid var(--ups-gold);
         }
         .toast.active { top: 30px; }
         .toast b { font-size: 18px; display: block; text-transform: uppercase; margin-bottom: 5px; }
-        .toast p { margin: 0; color: white; font-size: 14px; font-weight: 500; }
-
-        .reset { margin-top: 25px; font-size: 11px; color: #999; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="ups-card">
-        <div class="target-setter">
-            GOAL SETTER: <input type="number" id="targetInput" value="300" onchange="updateTarget()">
+        <div class="goal-section">
+            TARGET (UTC): <input type="number" id="targetInput" value="310" onchange="updateTarget()">
+            <div style="font-size: 11px; color: #777; margin-top: 3px;">REMAINING: <span id="remCount">310</span></div>
         </div>
 
-        <div class="counter-display" id="countVal">0</div>
-        
-        <div class="stats-box">
-            <span>COMPLETED: <span id="doneCount">0</span></span>
-            <span>REMAINING: <span id="remainingCount">300</span></span>
+        <div class="main-display">
+            <h1 id="utcDisp">0</h1>
+            <div style="font-size: 12px; font-weight: bold; color: #888;">ACTUAL UTC WORK</div>
         </div>
 
-        <div class="progress-container">
-            <div id="bar"></div>
+        <div class="progress-container"><div id="bar"></div></div>
+
+        <div class="stats-grid">
+            <div class="stat-box"><span>EMAIL RESCHED</span><span class="stat-num" id="eResDisp">0</span></div>
+            <div class="stat-box"><span>VM RESCHED</span><span class="stat-num" id="vResDisp">0</span></div>
         </div>
-        
-        <div class="controls">
-            <button class="btn btn-minus" onclick="changeCount(-1)">−</button>
-            <button class="btn btn-plus" onclick="changeCount(1)">SHIP ITEM +1</button>
+
+        <div class="btn-grid">
+            <button class="btn btn-utc" onclick="handleAction('utc')">SHIP ITEM (UTC) +1</button>
+            <button class="btn btn-res" onclick="handleAction('email')">Email Resched</button>
+            <button class="btn btn-res" onclick="handleAction('vm')">VM Resched</button>
+            <button class="btn btn-download" onclick="downloadReport()">Download Report</button>
         </div>
-        
-        <div class="reset" onclick="resetCount()">Reset Daily Log</div>
+
+        <div class="reset" onclick="resetAll()">Reset Daily Log</div>
     </div>
 
-    <div id="toast" class="toast">
-        <b id="toastTitle">Tracking Update</b>
-        <p id="toastMsg"></p>
-    </div>
+    <div id="toast" class="toast"><b id="toastTitle"></b><p id="toastMsg"></p></div>
 
     <script>
-        let count = localStorage.getItem('upsTrackerCount') ? parseInt(localStorage.getItem('upsTrackerCount')) : 0;
-        let target = localStorage.getItem('upsTrackerTarget') ? parseInt(localStorage.getItem('upsTrackerTarget')) : 300;
-        let toastTimer;
+        let data = localStorage.getItem('riyanshProData') ? JSON.parse(localStorage.getItem('riyanshProData')) : {
+            utc: 0, emailRes: 0, vmRes: 0, target: 310
+        };
 
-        const funnyLines = [
-            "Bhai aag lga rha hai tu!",
-            "Rukna mana hai, agla item pakad!",
-            "System phaad denge, chalte rho!",
-            "Abhi toh party shuru hui hai!",
-            "Oye hoye, kya speed hai!",
-            "Work mode: BEAST!",
-            "Lage raho Riyansh bhai!",
-            "Gazab ki raftaar!"
-        ];
+        const slangs = ["Bhai aag lga rha hai tu!", "System phaad denge, chalte rho!", "Oye hoye, kya speed hai!", "Gazab ki raftaar!", "Work mode: BEAST!"];
 
-        document.getElementById('targetInput').value = target;
+        document.getElementById('targetInput').value = data.target;
         updateUI();
 
-        function updateTarget() {
-            target = parseInt(document.getElementById('targetInput').value) || 300;
-            localStorage.setItem('upsTrackerTarget', target);
-            updateUI();
+        function handleAction(type) {
+            if (type === 'utc') {
+                data.utc++;
+                handleSlangs();
+                if (data.utc % 10 === 0) confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
+            } else if (type === 'email') {
+                data.emailRes++;
+                showToast("Email Logged", "Reschedule record ho gaya.");
+            } else if (type === 'vm') {
+                data.vmRes++;
+                showToast("VM Logged", "Voice mail reschedule record ho gaya.");
+            }
+
+            saveAndRefresh();
         }
 
-        function changeCount(val) {
-            if (val === -1 && count === 0) return;
-            count += val;
-            localStorage.setItem('upsTrackerCount', count);
-            updateUI();
-            if (val === 1) handleFeedback();
-        }
+        function handleSlangs() {
+            let title = "BHUT BADIA!";
+            let msg = slangs[Math.floor(Math.random() * slangs.length)];
+            let count = data.utc;
+            let target = data.target;
 
-        function handleFeedback() {
-            let title = "BHT BADIA!";
-            let remaining = target - count;
-            let msg = `Aapne ${count} item kr liye hain, ab bas ${remaining > 0 ? remaining : 0} aur bache hain target ke liye!`;
-
-            if (count === 50) {
-                title = "PHIR WHI CASUAL BEHVAIOUR!";
-                msg = `${target} chaiye mujhe, rukna nahi hai. Abhi ${target - count} baaki hain!`;
-            } else if (count === 100) {
-                title = "SUN MERI BAAT...";
-                msg = `Aisa kar lunch krle phir tune ${target} krne hain.`;
-            } else if (count === 200) {
-                title = "NI HORI PDAI MATLAAB?";
-                msg = `Abhi door ho, khich ke lo kaam!`;
-            } else if (count === target) {
-                title = "SHABASH LALA!";
-                msg = `Target achieved! ${target} items delivered successfully.`;
-                fireConfetti(200);
-            } else if (count > target) {
-                title = "MAAT KR LALA!";
-                msg = "Salary utni hi aaegi, zyada shana mat ban.";
-            } else if (count % 10 === 0) {
-                title = "SPEED UPDATED!";
-                msg = funnyLines[Math.floor(Math.random() * funnyLines.length)];
-                fireConfetti(60);
+            if (count === 50) { title = "PHIR WHI CASUAL BEHAVIOUR!"; msg = "Abhi sirf 50 hue hain, rukna mana hai!"; }
+            else if (count === 100) { title = "SUN MERI BAAT..."; msg = "Shatak poora! Lunch break banta hai ab."; }
+            else if (count === 200) { title = "NI HORI PDAI MATLAAB?"; msg = "200 cross! Khich ke lo kaam ab!"; }
+            else if (count === 300) { title = "SHABASH LALA!"; msg = "Target ke behad kareeb ho!"; }
+            else if (count === target) { title = "TARGET DONE!"; msg = "Maza aa gya! 310 cases delivered."; confetti({ particleCount: 150 }); }
+            else if (count > target) { 
+                title = "KOI BAAT NAHI SHER!"; 
+                msg = "Kr le, kr le... Promotion bhi toh chaiye na mere bhai!"; 
+                confetti({ particleCount: 30, colors: ['#ffb500'] });
             }
 
             showToast(title, msg);
-            if (count < target) fireConfetti(20);
+        }
+
+        function updateTarget() {
+            data.target = parseInt(document.getElementById('targetInput').value) || 310;
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('riyanshProData', JSON.stringify(data));
+            updateUI();
         }
 
         function updateUI() {
-            document.getElementById('countVal').innerText = count;
-            document.getElementById('doneCount').innerText = count;
-            let remaining = target - count;
-            document.getElementById('remainingCount').innerText = remaining > 0 ? remaining : 0;
-            let percent = (count / target) * 100;
-            document.getElementById('bar').style.width = Math.min(percent, 100) + "%";
+            document.getElementById('utcDisp').innerText = data.utc;
+            document.getElementById('eResDisp').innerText = data.emailRes;
+            document.getElementById('vResDisp').innerText = data.vmRes;
+            let rem = data.target - data.utc;
+            document.getElementById('remCount').innerText = rem > 0 ? rem : 0;
+            document.getElementById('bar').style.width = Math.min((data.utc/data.target)*100, 100) + "%";
         }
 
         function showToast(t, m) {
             const toast = document.getElementById('toast');
             document.getElementById('toastTitle').innerText = t;
             document.getElementById('toastMsg').innerText = m;
-            clearTimeout(toastTimer);
             toast.classList.add('active');
-            toastTimer = setTimeout(() => toast.classList.remove('active'), 6000);
+            setTimeout(() => toast.classList.remove('active'), 3500);
         }
 
-        function fireConfetti(amt) {
-            confetti({ 
-                particleCount: amt, 
-                spread: 70, 
-                origin: { y: 0.7 },
-                colors: ['#ffb500', '#ffffff', '#351c15'] 
-            });
+        function downloadReport() {
+            let csv = `Category,Count\nActual UTC,${data.utc}\nEmail Reschedule,${data.emailRes}\nVM Reschedule,${data.vmRes}`;
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `Riyansh_Report_${new Date().toLocaleDateString()}.csv`);
+            a.click();
         }
 
-        function resetCount() {
-            if(confirm("New day, new start? Log clear karein?")) {
-                count = 0;
-                localStorage.removeItem('upsTrackerCount');
-                updateUI();
+        function resetAll() {
+            if(confirm("Log clear karein?")) {
+                localStorage.removeItem('riyanshProData');
+                location.reload();
             }
         }
     </script>
