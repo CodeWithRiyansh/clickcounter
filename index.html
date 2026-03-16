@@ -3,200 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riyansh UPS Tracker - Stable Mode</title>
+    <title>Riyansh UPS Tracker - Final Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@600&display=swap');
-        :root { --ups-brown: #351c15; --ups-gold: #ffb500; --white: #ffffff; }
-
-        body {
-            font-family: 'Roboto', sans-serif; background-color: var(--ups-brown);
-            height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; color: var(--white);
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@600&family=Share+Tech+Mono&display=swap');
+        
+        :root {
+            --bg-color: #121212; --card-bg: #1e1e1e; --text-main: #e0e0e0;
+            --ups-gold: #ffb500; --neon-green: #39FF14; --alert-red: #ff3131;
         }
 
-        .ups-card {
-            background: var(--white); padding: 25px; border-radius: 12px; text-align: center;
-            width: 420px; color: var(--ups-brown); border-top: 8px solid var(--ups-gold); box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; }
 
-        .goal-section { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; font-size: 13px; }
-        input { border: 2px solid var(--ups-brown); width: 55px; text-align: center; font-weight: bold; border-radius: 4px; }
-
-        .main-display { margin: 5px 0; }
-        .main-display h1 { font-family: 'Oswald', sans-serif; font-size: 85px; margin: 0; color: var(--ups-brown); line-height: 1; }
+        /* Status Ticker */
+        .header-ticker { position: absolute; top: 15px; width: 90%; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 50px; border: 1px solid var(--ups-gold); text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 20px; }
+        .status-dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; transition: 0.3s; }
+        .dot-green { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); animation: pulse 1.5s infinite; }
+        .dot-red { background: var(--alert-red); box-shadow: 0 0 10px var(--alert-red); }
         
-        .progress-container { background: #e0e0e0; height: 12px; border-radius: 6px; margin: 15px 0; overflow: hidden; }
-        #bar { height: 100%; width: 0%; background: var(--ups-gold); transition: width 0.4s; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .stat-box { background: #f5f5f5; padding: 8px; border-radius: 5px; border: 1px solid #ddd; font-size: 11px; }
-        .stat-num { font-family: 'Oswald', sans-serif; font-size: 20px; display: block; color: #555; }
+        /* Main Dashboard Card */
+        .dashboard-card { background: var(--card-bg); width: 450px; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); border-top: 8px solid var(--ups-gold); position: relative; }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { border: none; padding: 15px; border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: 0.2s; }
-        
-        .btn-utc { background: var(--ups-gold); color: var(--ups-brown); grid-column: span 2; font-size: 16px; box-shadow: 0 4px 0 #cc9200; }
-        .btn-res { background: #eeeeee; color: #555; border: 1px solid #ccc; }
-        .btn-download { background: var(--ups-brown); color: var(--ups-gold); grid-column: span 2; margin-top: 10px; }
+        .cph-display { position: absolute; top: 15px; right: 20px; font-family: 'Oswald'; color: var(--ups-gold); font-size: 14px; }
 
+        .main-count h1 { font-family: 'Oswald', sans-serif; font-size: 100px; margin: 10px 0; line-height: 0.9; color: var(--ups-gold); }
+        .label { font-size: 12px; color: #888; font-weight: bold; letter-spacing: 2px; }
+
+        /* Counters Section (Email/Call) */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .stat-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid #333; }
+        .stat-val { display: block; font-family: 'Oswald'; font-size: 28px; color: #fff; }
+
+        /* Break Buttons */
+        .break-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .break-btn { background: #333; border: none; color: #aaa; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; transition: 0.2s; }
+        .break-btn.active { background: var(--alert-red); color: white; box-shadow: 0 0 15px rgba(255,49,49,0.4); }
+
+        /* Action Buttons */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 13px; transition: 0.2s; }
+        .btn-work { background: var(--ups-gold); color: #121212; grid-column: span 2; font-size: 18px; margin-bottom: 5px; box-shadow: 0 4px 0 #b38000; }
+        .btn-res { background: #2a2a2a; color: #ddd; border: 1px solid #444; }
         .btn:active { transform: translateY(2px); box-shadow: none; }
-        .reset { margin-top: 15px; font-size: 10px; color: #999; cursor: pointer; text-decoration: underline; }
 
-        /* Stable Toast Animation */
-        .toast {
-            position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
-            background: var(--ups-brown); color: var(--ups-gold); padding: 20px; 
-            border-radius: 8px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: top 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 1000; text-align: center; border: 2px solid var(--ups-gold);
-            visibility: hidden; opacity: 0;
-        }
-        .toast.active { top: 30px; visibility: visible; opacity: 1; }
-        .toast b { font-size: 18px; display: block; text-transform: uppercase; margin-bottom: 5px; }
+        #timer-text { font-family: 'Share Tech Mono'; color: var(--alert-red); font-size: 18px; margin-bottom: 10px; display: none; }
+
+        .toast { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); background: #222; color: var(--ups-gold); padding: 15px 30px; border-radius: 10px; border: 1px solid var(--ups-gold); transition: 0.6s; z-index: 1000; text-align: center; width: 300px; }
+        .toast.active { top: 30px; }
     </style>
 </head>
 <body>
 
-    <div class="ups-card">
-        <div class="goal-section">
-            TARGET : <input type="number" id="targetInput" value="310" onchange="updateTarget()">
-            <div style="font-size: 11px; color: #777; margin-top: 3px;">REMAINING: <span id="remCount">310</span></div>
-        </div>
-
-        <div class="main-display">
-            <h1 id="utcDisp">0</h1>
-            <div style="font-size: 12px; font-weight: bold; color: #888;">ACTUAL WORK ITEM</div>
-        </div>
-
-        <div class="progress-container"><div id="bar"></div></div>
-
-        <div class="stats-grid">
-            <div class="stat-box"><span>EMAIL RESCHED</span><span class="stat-num" id="eResDisp">0</span></div>
-            <div class="stat-box"><span>VM RESCHED</span><span class="stat-num" id="vResDisp">0</span></div>
-        </div>
-
-        <div class="btn-grid">
-            <button class="btn btn-utc" onclick="handleAction('utc')">WORK ITEM +1</button>
-            <button class="btn btn-res" onclick="handleAction('email')">Email Resched</button>
-            <button class="btn btn-res" onclick="handleAction('vm')">VM Resched</button>
-            <button class="btn btn-download" onclick="downloadReport()">Download Report</button>
-        </div>
-
-        <div class="reset" onclick="resetAll()">Reset Daily Log</div>
+    <div class="header-ticker">
+        <div id="live-dot" class="status-dot dot-green"></div>
+        <span id="ticker-text">STATUS: WORKING | TARGET: 310</span>
+        <span id="clock" style="color:var(--ups-gold)">00:00:00</span>
     </div>
 
-    <div id="toast" class="toast"><b id="toastTitle"></b><p id="toastMsg"></p></div>
+    <div class="dashboard-card">
+        <div class="cph-display">CPH: <span id="cph-val">0</span></div>
+
+        <div id="timer-text">ON BREAK: <span id="b-clock">00:00</span></div>
+
+        <div class="main-count">
+            <span class="label">ACTUAL WORK ITEMS</span>
+            <h1 id="utcDisp">0</h1>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="label">EMAIL RESCHED</span>
+                <span class="stat-val" id="eDisp">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">CALL RESCHED</span>
+                <span class="stat-val" id="cDisp">0</span>
+            </div>
+        </div>
+
+        <div class="break-grid">
+            <button class="break-btn" id="l-btn" onclick="startBreak(30, 'l-btn')">LUNCH (30m)</button>
+            <button class="break-btn" id="b1-btn" onclick="startBreak(15, 'b1-btn')">BRK 1 (15m)</button>
+            <button class="break-btn" id="b2-btn" onclick="startBreak(15, 'b2-btn')">BRK 2 (15m)</button>
+        </div>
+
+        <div class="action-grid">
+            <button class="btn btn-work" onclick="logWork()">SHIP ITEM +1</button>
+            <button class="btn btn-res" onclick="logOther('email')">Email</button>
+            <button class="btn btn-res" onclick="logOther('call')">Call/VM</button>
+            <button class="btn btn-res" style="grid-column: span 2; background:var(--bg-color)" onclick="downloadReport()">Download Excel Report</button>
+        </div>
+
+        <p style="font-size: 10px; color: #555; cursor: pointer; margin-top: 15px;" onclick="resetAll()">Reset All Data</p>
+    </div>
+
+    <div id="toast" class="toast"><b id="tTitle"></b><p id="tMsg" style="margin:5px 0 0;"></p></div>
 
     <script>
-        let data = localStorage.getItem('riyanshProData') ? JSON.parse(localStorage.getItem('riyanshProData')) : {
-            utc: 0, emailRes: 0, vmRes: 0, target: 310
+        let data = localStorage.getItem('rta_v4') ? JSON.parse(localStorage.getItem('rta_v4')) : {
+            utc: 0, email: 0, call: 0, target: 310, start: Date.now()
         };
 
-        const slangs = ["Bhai aag lga rha hai tu!", "System phaad denge, chalte rho!", "Oye hoye, kya speed hai!", "Gazab ki raftaar!", "Work mode: BEAST!"];
-        let toastQueue = [];
-        let isToastShowing = false;
+        let breakInterval = null;
 
-        document.getElementById('targetInput').value = data.target;
-        updateUI();
-
-        function handleAction(type) {
-            if (type === 'utc') {
-                data.utc++;
-                handleSlangs();
-                if (data.utc % 10 === 0) confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
-            } else if (type === 'email') {
-                data.emailRes++;
-                queueToast("Email Logged", "Reschedule record ho gaya.");
-            } else if (type === 'vm') {
-                data.vmRes++;
-                queueToast("VM Logged", "Voice mail reschedule record ho gaya.");
-            }
-            saveAndRefresh();
+        function logWork() {
+            if (breakInterval) { showToast("Oye Sher!", "Break pe ho, login toh karlo!"); return; }
+            data.utc++;
+            handleMotivation();
+            save();
         }
 
-        function handleSlangs() {
-            let title = "BHUT BADIA!";
-            let msg = slangs[Math.floor(Math.random() * slangs.length)];
-            let count = data.utc;
-            let target = data.target;
+        function logOther(type) {
+            if (type === 'email') data.email++; else data.call++;
+            showToast("Logged", `${type} record ho gaya.`);
+            save();
+        }
 
-            if (count === 50) { title = "PHIR WHI CASUAL BEHAVIOUR!"; msg = "Abhi sirf 50 hue hain, rukna mana hai!"; }
-            else if (count === 100) { title = "SUN MERI BAAT..."; msg = "Century puri hogyi! Lunch break banta hai ab."; }
-            else if (count === 200) { title = "NI HORI PDAI MATLAAB?"; msg = "200 cross! Khich ke lo kaam ab!"; }
-            else if (count === 300) { title = "SHABASH LALA!"; msg = "Target ke behad kareeb ho!"; }
-            else if (count === target) { title = "TARGET DONE!"; msg = "Maza aa gya! 310 cases delivered."; confetti({ particleCount: 150 }); }
-            else if (count > target) { 
-                title = "KOI BAAT NAHI SHER!"; 
-                msg = "Kr le, kr le... Promotion bhi toh chaiye na mere bhai!"; 
-                confetti({ particleCount: 30, colors: ['#ffb500'] });
+        function startBreak(mins, btnId) {
+            const dot = document.getElementById('live-dot');
+            const ticker = document.getElementById('ticker-text');
+            const timerDiv = document.getElementById('timer-text');
+
+            if (breakInterval) {
+                clearInterval(breakInterval);
+                breakInterval = null;
+                document.querySelectorAll('.break-btn').forEach(b => b.classList.remove('active'));
+                timerDiv.style.display = 'none';
+                dot.className = 'status-dot dot-green';
+                ticker.innerText = `STATUS: WORKING | REMAINING: ${data.target - data.utc}`;
+                showToast("Welcome Back!", "Chalo kaam pe lag jao.");
+                return;
             }
 
-            queueToast(title, msg);
+            // Start Break Logic
+            let sec = mins * 60;
+            document.getElementById(btnId).classList.add('active');
+            timerDiv.style.display = 'block';
+            dot.className = 'status-dot dot-red';
+            ticker.innerText = "STATUS: ON BREAK (OFFLINE)";
+
+            breakInterval = setInterval(() => {
+                sec--;
+                let m = Math.floor(sec / 60);
+                let s = sec % 60;
+                document.getElementById('b-clock').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                if (sec <= 0) document.getElementById('b-clock').innerText = "LIMIT EXCEEDED!";
+            }, 1000);
         }
 
-        function queueToast(title, msg) {
-            toastQueue.push({ title, msg });
-            processQueue();
+        function handleMotivation() {
+            let t = "Gajab!"; let m = "Speed sahi hai bhai!";
+            if (data.utc === 100) { t="Century!"; m="100 poore, lunch break yaad hai na?"; }
+            else if (data.utc === 310) { t="TARGET!"; m="310 Delivered! System phaad diya."; confetti(); }
+            else if (data.utc > 310) { t="Sher!"; m="Promotion bhi toh chaiye na mere bhai!"; }
+            showToast(t, m);
+            if(data.utc % 15 === 0) confetti({particleCount: 40, origin:{y:0.8}});
         }
 
-        function processQueue() {
-            if (isToastShowing || toastQueue.length === 0) return;
-
-            isToastShowing = true;
-            const current = toastQueue.shift();
-            const toast = document.getElementById('toast');
-            
-            document.getElementById('toastTitle').innerText = current.title;
-            document.getElementById('toastMsg').innerText = current.msg;
-            
-            toast.classList.add('active');
-
-            // 3 seconds tak dikhayega (stable)
-            setTimeout(() => {
-                toast.classList.remove('active');
-                // Animation khatam hone ka wait karega agle toast se pehle
-                setTimeout(() => {
-                    isToastShowing = false;
-                    processQueue();
-                }, 600); 
-            }, 3000);
-        }
-
-        function updateTarget() {
-            data.target = parseInt(document.getElementById('targetInput').value) || 310;
-            saveAndRefresh();
-        }
-
-        function saveAndRefresh() {
-            localStorage.setItem('riyanshProData', JSON.stringify(data));
+        function save() {
+            localStorage.setItem('rta_v4', JSON.stringify(data));
             updateUI();
         }
 
         function updateUI() {
             document.getElementById('utcDisp').innerText = data.utc;
-            document.getElementById('eResDisp').innerText = data.emailRes;
-            document.getElementById('vResDisp').innerText = data.vmRes;
-            let rem = data.target - data.utc;
-            document.getElementById('remCount').innerText = rem > 0 ? rem : 0;
-            document.getElementById('bar').style.width = Math.min((data.utc/data.target)*100, 100) + "%";
+            document.getElementById('eDisp').innerText = data.email;
+            document.getElementById('cDisp').innerText = data.call;
+            
+            let hrs = (Date.now() - data.start) / 3600000;
+            document.getElementById('cph-val').innerText = hrs > 0 ? Math.round(data.utc / hrs) : 0;
+            
+            if (!breakInterval) {
+                document.getElementById('ticker-text').innerText = `STATUS: WORKING | REMAINING: ${data.target - data.utc}`;
+            }
+        }
+
+        function showToast(t, m) {
+            const toast = document.getElementById('toast');
+            document.getElementById('tTitle').innerText = t;
+            document.getElementById('tMsg').innerText = m;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
         }
 
         function downloadReport() {
-            let csv = `Category,Count\nTotal Work Item,${data.utc}\nEmail Reschedule,${data.emailRes}\nVM Reschedule,${data.vmRes}`;
+            let csv = `Metric,Count\nActual Work (UTC),${data.utc}\nEmail Reschedule,${data.email}\nCall/VM Reschedule,${data.call}\nAvg CPH,${document.getElementById('cph-val').innerText}`;
             const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `Report_${new Date().toLocaleDateString()}.csv`);
+            a.href = URL.createObjectURL(blob);
+            a.download = `UPS_Report_${new Date().toLocaleDateString()}.csv`;
             a.click();
         }
 
-        function resetAll() {
-            if(confirm("Saara data clear karein?")) {
-                localStorage.removeItem('riyanshProData');
-                location.reload();
-            }
-        }
+        function resetAll() { if(confirm("Saara data clear kar dein?")) { localStorage.clear(); location.reload(); } }
+        
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+        
+        updateUI();
     </script>
 </body>
 </html>
