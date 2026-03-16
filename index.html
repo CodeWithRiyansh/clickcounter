@@ -58,13 +58,13 @@
 
     <div class="ups-card">
         <div class="goal-section">
-            TARGET (UTC): <input type="number" id="targetInput" value="310" onchange="updateTarget()">
+            TARGET : <input type="number" id="targetInput" value="310" onchange="updateTarget()">
             <div style="font-size: 11px; color: #777; margin-top: 3px;">REMAINING: <span id="remCount">310</span></div>
         </div>
 
         <div class="main-display">
             <h1 id="utcDisp">0</h1>
-            <div style="font-size: 12px; font-weight: bold; color: #888;">ACTUAL UTC WORK</div>
+            <div style="font-size: 12px; font-weight: bold; color: #888;">ACTUAL WORK ITEM</div>
         </div>
 
         <div class="progress-container"><div id="bar"></div></div>
@@ -75,7 +75,7 @@
         </div>
 
         <div class="btn-grid">
-            <button class="btn btn-utc" onclick="handleAction('utc')">SHIP ITEM (UTC) +1</button>
+            <button class="btn btn-utc" onclick="handleAction('utc')">WORK ITEM +1</button>
             <button class="btn btn-res" onclick="handleAction('email')">Email Resched</button>
             <button class="btn btn-res" onclick="handleAction('vm')">VM Resched</button>
             <button class="btn btn-download" onclick="downloadReport()">Download Report</button>
@@ -119,7 +119,7 @@
             let target = data.target;
 
             if (count === 50) { title = "PHIR WHI CASUAL BEHAVIOUR!"; msg = "Abhi sirf 50 hue hain, rukna mana hai!"; }
-            else if (count === 100) { title = "SUN MERI BAAT..."; msg = "Shatak poora! Lunch break banta hai ab."; }
+            else if (count === 100) { title = "SUN MERI BAAT..."; msg = "Century puri hogyi! Lunch break banta hai ab."; }
             else if (count === 200) { title = "NI HORI PDAI MATLAAB?"; msg = "200 cross! Khich ke lo kaam ab!"; }
             else if (count === 300) { title = "SHABASH LALA!"; msg = "Target ke behad kareeb ho!"; }
             else if (count === target) { title = "TARGET DONE!"; msg = "Maza aa gya! 310 cases delivered."; confetti({ particleCount: 150 }); }
@@ -156,16 +156,16 @@
             document.getElementById('toastTitle').innerText = t;
             document.getElementById('toastMsg').innerText = m;
             toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 3500);
+              setTimeout(() => toast.classList.remove('active'), 3500);
         }
 
         function downloadReport() {
-            let csv = `Category,Count\nActual UTC,${data.utc}\nEmail Reschedule,${data.emailRes}\nVM Reschedule,${data.vmRes}`;
+            let csv = `Category,Count\nTotal Work Item,${data.utc}\nEmail Reschedule,${data.emailRes}\nVM Reschedule,${data.vmRes}`;
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', `Riyansh_Report_${new Date().toLocaleDateString()}.csv`);
+            a.setAttribute('download', `Today_Report_${new Date().toLocaleDateString()}.csv`);
             a.click();
         }
 
