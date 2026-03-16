@@ -3,181 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riyansh UPS Tracker - Final Edition</title>
+    <title>Riyansh Tracker - Custom Target</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@600&family=Share+Tech+Mono&display=swap');
         
         :root {
-            --bg-color: #121212; --card-bg: #1e1e1e; --text-main: #e0e0e0;
+            --bg-color: #121212; --card-bg: #1e1e1e;
             --ups-gold: #ffb500; --neon-green: #39FF14; --alert-red: #ff3131;
         }
 
-        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; overflow: hidden; }
 
-        /* Status Ticker */
         .header-ticker { position: absolute; top: 15px; width: 90%; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 50px; border: 1px solid var(--ups-gold); text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 20px; }
-        .status-dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; transition: 0.3s; }
+        .status-dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; }
         .dot-green { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); animation: pulse 1.5s infinite; }
         .dot-red { background: var(--alert-red); box-shadow: 0 0 10px var(--alert-red); }
-        
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* Main Dashboard Card */
         .dashboard-card { background: var(--card-bg); width: 450px; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); border-top: 8px solid var(--ups-gold); position: relative; }
+        
+        /* Target Input Styling */
+        .target-box { margin-bottom: 10px; font-size: 12px; color: #888; }
+        #target-input { background: transparent; border: 1px solid #444; color: var(--ups-gold); font-family: 'Oswald'; font-size: 18px; width: 60px; text-align: center; border-radius: 4px; outline: none; }
 
-        .cph-display { position: absolute; top: 15px; right: 20px; font-family: 'Oswald'; color: var(--ups-gold); font-size: 14px; }
+        .main-count h1 { font-family: 'Oswald', sans-serif; font-size: 100px; margin: 5px 0; line-height: 0.9; color: var(--ups-gold); }
+        #timer-text { font-family: 'Share Tech Mono'; color: var(--alert-red); font-size: 22px; margin-bottom: 10px; display: none; }
 
-        .main-count h1 { font-family: 'Oswald', sans-serif; font-size: 100px; margin: 10px 0; line-height: 0.9; color: var(--ups-gold); }
-        .label { font-size: 12px; color: #888; font-weight: bold; letter-spacing: 2px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
+        .stat-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid #333; }
+        .stat-val { display: block; font-family: 'Oswald'; font-size: 24px; color: #fff; }
 
-        /* Counters Section (Email/Call) */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-        .stat-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid #333; }
-        .stat-val { display: block; font-family: 'Oswald'; font-size: 28px; color: #fff; }
-
-        /* Break Buttons */
         .break-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-        .break-btn { background: #333; border: none; color: #aaa; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; transition: 0.2s; }
-        .break-btn.active { background: var(--alert-red); color: white; box-shadow: 0 0 15px rgba(255,49,49,0.4); }
+        .break-btn { background: #333; border: none; color: #aaa; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .break-btn.active { background: var(--alert-red); color: white; }
 
-        /* Action Buttons */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 13px; transition: 0.2s; }
-        .btn-work { background: var(--ups-gold); color: #121212; grid-column: span 2; font-size: 18px; margin-bottom: 5px; box-shadow: 0 4px 0 #b38000; }
-        .btn-res { background: #2a2a2a; color: #ddd; border: 1px solid #444; }
-        .btn:active { transform: translateY(2px); box-shadow: none; }
+        .btn-work { background: var(--ups-gold); color: #121212; width: 100%; padding: 18px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 20px; border: none; box-shadow: 0 4px 0 #b38000; margin-bottom: 10px; }
+        .btn-work:active { transform: translateY(2px); box-shadow: none; }
 
-        #timer-text { font-family: 'Share Tech Mono'; color: var(--alert-red); font-size: 18px; margin-bottom: 10px; display: none; }
-
-        .toast { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); background: #222; color: var(--ups-gold); padding: 15px 30px; border-radius: 10px; border: 1px solid var(--ups-gold); transition: 0.6s; z-index: 1000; text-align: center; width: 300px; }
-        .toast.active { top: 30px; }
+        .toast { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); background: #222; color: var(--ups-gold); padding: 20px 40px; border-radius: 12px; border: 2px solid var(--ups-gold); transition: 0.5s; z-index: 2000; text-align: center; width: 350px; }
+        .toast.active { top: 40px; }
     </style>
 </head>
 <body>
 
     <div class="header-ticker">
         <div id="live-dot" class="status-dot dot-green"></div>
-        <span id="ticker-text">STATUS: WORKING | TARGET: 310</span>
+        <span id="ticker-text">STATUS: WORKING | REMAINING: 0</span>
         <span id="clock" style="color:var(--ups-gold)">00:00:00</span>
     </div>
 
     <div class="dashboard-card">
-        <div class="cph-display">CPH: <span id="cph-val">0</span></div>
+        <div class="target-box">
+            SET DAILY TARGET: <input type="number" id="target-input" value="310" onchange="updateTarget()">
+        </div>
 
-        <div id="timer-text">ON BREAK: <span id="b-clock">00:00</span></div>
+        <div id="timer-text">BREAK TIME: <span id="b-clock">00:00</span></div>
 
         <div class="main-count">
-            <span class="label">ACTUAL WORK ITEMS</span>
             <h1 id="utcDisp">0</h1>
+            <span style="font-size:11px; color:#888; font-weight:bold; letter-spacing: 2px;">ITEMS LOGGED</span>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-box">
-                <span class="label">EMAIL RESCHED</span>
-                <span class="stat-val" id="eDisp">0</span>
-            </div>
-            <div class="stat-box">
-                <span class="label">CALL RESCHED</span>
-                <span class="stat-val" id="cDisp">0</span>
-            </div>
+            <div class="stat-box"><span style="font-size:10px; color:#888;">EMAIL</span><span class="stat-val" id="eDisp">0</span></div>
+            <div class="stat-box"><span style="font-size:10px; color:#888;">CALL/VM</span><span class="stat-val" id="cDisp">0</span></div>
         </div>
 
         <div class="break-grid">
-            <button class="break-btn" id="l-btn" onclick="startBreak(30, 'l-btn')">LUNCH (30m)</button>
-            <button class="break-btn" id="b1-btn" onclick="startBreak(15, 'b1-btn')">BRK 1 (15m)</button>
-            <button class="break-btn" id="b2-btn" onclick="startBreak(15, 'b2-btn')">BRK 2 (15m)</button>
+            <button class="break-btn" id="l-btn" onclick="startBreak(30, 'l-btn')">LUNCH</button>
+            <button class="break-btn" id="b1-btn" onclick="startBreak(15, 'b1-btn')">BRK 1</button>
+            <button class="break-btn" id="b2-btn" onclick="startBreak(15, 'b2-btn')">BRK 2</button>
         </div>
 
-        <div class="action-grid">
-            <button class="btn btn-work" onclick="logWork()">SHIP ITEM +1</button>
-            <button class="btn btn-res" onclick="logOther('email')">Email</button>
-            <button class="btn btn-res" onclick="logOther('call')">Call/VM</button>
-            <button class="btn btn-res" style="grid-column: span 2; background:var(--bg-color)" onclick="downloadReport()">Download Excel Report</button>
+        <button class="btn-work" onclick="logWork()">SHIP ITEM +1</button>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button style="padding:10px; background:#2a2a2a; color:#ddd; border:none; border-radius:5px; cursor:pointer;" onclick="logOther('email')">Email</button>
+            <button style="padding:10px; background:#2a2a2a; color:#ddd; border:none; border-radius:5px; cursor:pointer;" onclick="logOther('call')">Call/VM</button>
         </div>
-
-        <p style="font-size: 10px; color: #555; cursor: pointer; margin-top: 15px;" onclick="resetAll()">Reset All Data</p>
+        <p style="font-size: 10px; color: #444; cursor: pointer; margin-top: 15px;" onclick="resetAll()">Reset Daily Data</p>
     </div>
 
-    <div id="toast" class="toast"><b id="tTitle"></b><p id="tMsg" style="margin:5px 0 0;"></p></div>
+    <div id="toast" class="toast"><b id="tTitle" style="font-size:18px;"></b><p id="tMsg" style="margin:8px 0 0; font-size:16px;"></p></div>
 
     <script>
-        let data = localStorage.getItem('rta_v4') ? JSON.parse(localStorage.getItem('rta_v4')) : {
-            utc: 0, email: 0, call: 0, target: 310, start: Date.now()
+        let data = localStorage.getItem('rta_v7') ? JSON.parse(localStorage.getItem('rta_v7')) : { 
+            utc: 0, email: 0, call: 0, target: 310 
         };
 
+        const motivation = ["Shabaash!", "Rukna nahi hai!", "Speed banaye rakho!", "Ek aur khatam!", "Sher hai tu!", "Gazab bhai!", "Keep pushing!", "System set hai!"];
         let breakInterval = null;
 
         function logWork() {
-            if (breakInterval) { showToast("Oye Sher!", "Break pe ho, login toh karlo!"); return; }
+            if (breakInterval) { showToast("BREAK PE HO!", "Pehle login kar lala!"); return; }
             data.utc++;
-            handleMotivation();
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            checkLogic();
             save();
         }
 
-        function logOther(type) {
-            if (type === 'email') data.email++; else data.call++;
-            showToast("Logged", `${type} record ho gaya.`);
-            save();
-        }
+        function checkLogic() {
+            let count = data.utc;
+            let target = data.target;
+            let t = "SHER!";
+            let m = motivation[Math.floor(Math.random() * motivation.length)];
 
-        function startBreak(mins, btnId) {
-            const dot = document.getElementById('live-dot');
-            const ticker = document.getElementById('ticker-text');
-            const timerDiv = document.getElementById('timer-text');
+            if (count === 50) { t = "OYE!"; m = "Bhai kyun nahi ho rhe hain work item?"; }
+            else if (count === 100) { t = "CASUAL!"; m = "Phir wahi casual behaviour!"; }
+            else if (count === 150) { t = "ALAG HI!"; m = "Ye jo sir aap kaam kr rhe ho, kuch alag kr dia aapne!"; }
+            else if (count === 200) { t = "DEFEAT!"; m = "Matlab sir defeat sa kr dia aapne sabko!"; }
+            else if (count === 250) { t = "LALA!"; m = "Jaldi kr lala, post shift huddle bhi hai iske badd!"; }
+            else if (count === target) { t = "RUK JA!"; m = `Ruk ja lala aaj ka target (${target}) itna hi hai!`; }
+            else if (count > target) { t = "PROMOTION!"; m = "Chalo kar le yaar, promotion bhi toh chahiye na!"; }
+            
+            // Overwriting final message for 310+ or target+
+            if (count >= target + 10) { t = "GREAT POTENTIAL!"; m = "Great potential bhai, kal milte hain naye target ke sath!"; }
 
-            if (breakInterval) {
-                clearInterval(breakInterval);
-                breakInterval = null;
-                document.querySelectorAll('.break-btn').forEach(b => b.classList.remove('active'));
-                timerDiv.style.display = 'none';
-                dot.className = 'status-dot dot-green';
-                ticker.innerText = `STATUS: WORKING | REMAINING: ${data.target - data.utc}`;
-                showToast("Welcome Back!", "Chalo kaam pe lag jao.");
-                return;
-            }
-
-            // Start Break Logic
-            let sec = mins * 60;
-            document.getElementById(btnId).classList.add('active');
-            timerDiv.style.display = 'block';
-            dot.className = 'status-dot dot-red';
-            ticker.innerText = "STATUS: ON BREAK (OFFLINE)";
-
-            breakInterval = setInterval(() => {
-                sec--;
-                let m = Math.floor(sec / 60);
-                let s = sec % 60;
-                document.getElementById('b-clock').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                if (sec <= 0) document.getElementById('b-clock').innerText = "LIMIT EXCEEDED!";
-            }, 1000);
-        }
-
-        function handleMotivation() {
-            let t = "Gajab!"; let m = "Speed sahi hai bhai!";
-            if (data.utc === 100) { t="Century!"; m="100 poore, lunch break yaad hai na?"; }
-            else if (data.utc === 310) { t="TARGET!"; m="310 Delivered! System phaad diya."; confetti(); }
-            else if (data.utc > 310) { t="Sher!"; m="Promotion bhi toh chaiye na mere bhai!"; }
             showToast(t, m);
-            if(data.utc % 15 === 0) confetti({particleCount: 40, origin:{y:0.8}});
+            if([50,100,150,200,250,target].includes(count)) confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
         }
 
-        function save() {
-            localStorage.setItem('rta_v4', JSON.stringify(data));
-            updateUI();
-        }
-
-        function updateUI() {
-            document.getElementById('utcDisp').innerText = data.utc;
-            document.getElementById('eDisp').innerText = data.email;
-            document.getElementById('cDisp').innerText = data.call;
-            
-            let hrs = (Date.now() - data.start) / 3600000;
-            document.getElementById('cph-val').innerText = hrs > 0 ? Math.round(data.utc / hrs) : 0;
-            
-            if (!breakInterval) {
-                document.getElementById('ticker-text').innerText = `STATUS: WORKING | REMAINING: ${data.target - data.utc}`;
-            }
+        function updateTarget() {
+            data.target = parseInt(document.getElementById('target-input').value) || 310;
+            save();
+            showToast("TARGET UPDATED", `Ab aapka naya target ${data.target} hai.`);
         }
 
         function showToast(t, m) {
@@ -185,22 +135,46 @@
             document.getElementById('tTitle').innerText = t;
             document.getElementById('tMsg').innerText = m;
             toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 3000);
+            setTimeout(() => toast.classList.remove('active'), 6000);
         }
 
-        function downloadReport() {
-            let csv = `Metric,Count\nActual Work (UTC),${data.utc}\nEmail Reschedule,${data.email}\nCall/VM Reschedule,${data.call}\nAvg CPH,${document.getElementById('cph-val').innerText}`;
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `UPS_Report_${new Date().toLocaleDateString()}.csv`;
-            a.click();
+        function startBreak(mins, btnId) {
+            const timerDisplay = document.getElementById('timer-text');
+            const dot = document.getElementById('live-dot');
+            const ticker = document.getElementById('ticker-text');
+
+            if (breakInterval) {
+                clearInterval(breakInterval);
+                breakInterval = null;
+                document.querySelectorAll('.break-btn').forEach(b => b.classList.remove('active'));
+                timerDisplay.style.display = 'none';
+                dot.className = 'status-dot dot-green';
+                return;
+            }
+
+            let sec = mins * 60;
+            document.getElementById(btnId).classList.add('active');
+            timerDisplay.style.display = 'block';
+            dot.className = 'status-dot dot-red';
+            breakInterval = setInterval(() => {
+                sec--;
+                let m = Math.floor(sec / 60); let s = sec % 60;
+                document.getElementById('b-clock').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                if (sec <= 0) document.getElementById('b-clock').innerText = "LIMIT EXCEEDED!";
+            }, 1000);
         }
 
-        function resetAll() { if(confirm("Saara data clear kar dein?")) { localStorage.clear(); location.reload(); } }
-        
+        function logOther(type) { if (type === 'email') data.email++; else data.call++; save(); }
+        function save() { localStorage.setItem('rta_v7', JSON.stringify(data)); updateUI(); }
+        function updateUI() {
+            document.getElementById('utcDisp').innerText = data.utc;
+            document.getElementById('eDisp').innerText = data.email;
+            document.getElementById('cDisp').innerText = data.call;
+            document.getElementById('target-input').value = data.target;
+            document.getElementById('ticker-text').innerText = `STATUS: ${breakInterval ? 'OFFLINE' : 'WORKING'} | REMAINING: ${Math.max(0, data.target - data.utc)}`;
+        }
+        function resetAll() { if(confirm("Clear data?")) { localStorage.clear(); location.reload(); } }
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-        
         updateUI();
     </script>
 </body>
